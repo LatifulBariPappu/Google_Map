@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         showMap=findViewById(R.id.showMap);
-
         showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
