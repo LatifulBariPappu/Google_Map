@@ -14,8 +14,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     Location currentLocation;
     FusedLocationProviderClient fusedClient;
@@ -37,14 +41,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
                 return;
             }
+        Task<Location> task=fusedClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location!=null){
+                    currentLocation=location;
+                    SupportMapFragment supportMapFragment=(SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                    assert supportMapFragment!=null;
+                    supportMapFragment.getMapAsync(MapsActivity.this);
+                }
+            }
+        });
         }
 
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.gMap=googleMap;
-        LatLng mapBangladesh=new LatLng(23.87275,90.30955);
-        this.gMap.addMarker(new MarkerOptions().position(mapBangladesh).title("Marker in Bangladesh"));
-        this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapBangladesh));
+        LatLng latLng=new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+        MarkerOptions markerOptions=new MarkerOptions().position(latLng).title("My Current Location");
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+        googleMap.addMarker(markerOptions);
     }
 }
