@@ -21,6 +21,9 @@
         android:id="@+id/search"
         app:iconifiedByDefault="false"
         app:queryHint="Search location"
-        android:focusable="false"/>
+        android:focusable="false"
+        app:closeIcon="@drawable/baseline_clear_24"
+        app:searchIcon="@drawable/mapmarker"
+        android:background="@drawable/lavender_border"/>
 
 </RelativeLayout>
