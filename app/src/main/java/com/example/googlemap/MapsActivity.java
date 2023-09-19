@@ -6,9 +6,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -21,6 +24,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     Location currentLocation;
@@ -42,6 +48,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                String loc=searchView.getQuery().toString();
+                if(loc==null){
+                    Toast.makeText(MapsActivity.this, "Location not found", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    Geocoder geocoder=new Geocoder(MapsActivity.this, Locale.getDefault());
+                    try{
+                        List<Address> addressList=geocoder.getFromLocationName(loc,1);
+                        if(addressList.size()>0){
+                            LatLng latLng=new LatLng(addressList.get(0).getLatitude(),addressList.get(0).getLongitude());
+                        }
+                    }
+                }
                 return false;
             }
 
