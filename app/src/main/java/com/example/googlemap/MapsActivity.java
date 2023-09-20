@@ -15,16 +15,19 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,7 +61,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         List<Address> addressList=geocoder.getFromLocationName(loc,1);
                         if(addressList.size()>0){
                             LatLng latLng=new LatLng(addressList.get(0).getLatitude(),addressList.get(0).getLongitude());
+                            if(marker!=null){
+                                marker.remove();
+                            }
+                            MarkerOptions markerOptions=new MarkerOptions().position(latLng).title(loc);
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                            CameraUpdate cameraUpdate=CameraUpdateFactory.newLatLngZoom(latLng,5);
+                            gMap.animateCamera(cameraUpdate);
+                            marker=gMap.addMarker(markerOptions);
                         }
+                    }catch (IOException e){
+                        e.printStackTrace();
                     }
                 }
                 return false;
@@ -95,6 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        this.gMap=googleMap;
         LatLng latLng=new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
         MarkerOptions markerOptions=new MarkerOptions().position(latLng).title("My Current Location");
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
